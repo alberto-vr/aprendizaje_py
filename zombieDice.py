@@ -1,5 +1,6 @@
 # prueba dentro ish
 
+# Prueba tras git pull desde pc
 
 # 13 dados
 # - 3 Rojos (2 footsteps, 3 shotguns, 1 brain)
