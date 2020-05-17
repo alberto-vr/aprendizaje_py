@@ -1,3 +1,6 @@
+# prueba dentro ish
+
+
 # 13 dados
 # - 3 Rojos (2 footsteps, 3 shotguns, 1 brain)
 # - 4 Amarillos (2 footsteps, 2 shotguns, 2 brain)
