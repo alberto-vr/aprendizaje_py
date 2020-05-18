@@ -27,20 +27,23 @@ import random
 
 # A. Definir juego
 # 1. Definir los dados
-RED_DICE_DEF = {'1':'F','2':'F','3':'S','4':'S','5':'S','6':'B'}
-YELLOW_DICE_DEF = {'1':'F','2':'F','3':'S','4':'S','5':'B','6':'B'}
-GREEN_DICE_DEF = {'1':'F','2':'F','3':'S','4':'B','5':'B','6':'B'}
+RED_DICE_DEF = {'1':'Footstep','2':'Footstep','3':'Shotgun','4':'Shotgun','5':'Shotgun','6':'Brain'}
+YELLOW_DICE_DEF = {'1':'Footstep','2':'Footstep','3':'Shotgun','4':'Shotgun','5':'Brain','6':'Brain'}
+GREEN_DICE_DEF = {'1':'Footstep','2':'Footstep','3':'Shotgun','4':'Brain','5':'Brain','6':'Brain'}
 
 AMOUNT_RED = 3
 AMOUNT_YELLOW = 4
 AMOUNT_GREEN = 6
 
+player_board_template = {'Footstep':0,'Shotgun':0,'Brain':0}
+
+
+# Cosas temporales
+player_board = dict(player_board_template)
 global_pool_dice = []
 player_pool_dice = []
-player_board = []
 
 # Llenar el cubilete
-
 def fillPoolDice():
     for i_red in range(AMOUNT_RED):
         global_pool_dice.append('red_dice')
@@ -59,6 +62,7 @@ def pickDices(amount_of_dices):
 
 # 3. Lanzar los dados
 def throw_dice():
+	  player_board_throw = dict(player_board_template)
     while len(player_pool_dice)>0:
         if player_pool_dice[0] == 'red_dice':
             dice_result = RED_DICE_DEF[str(random.randint(1,6))]
@@ -66,9 +70,12 @@ def throw_dice():
             dice_result = YELLOW_DICE_DEF[str(random.randint(1,6))]
         if player_pool_dice[0] == 'green_dice':
             dice_result = GREEN_DICE_DEF[str(random.randint(1,6))]
-        player_board.append(dice_result)
+        player_board_throw[dice_result] += 1
         player_pool_dice.pop(0)
+    #print('Resultado de la tirada:' + \n\n)
+    #for r,i print()
 
+# Test
 fillPoolDice()
 pickDices(3)
 print('Antes de tirar:')
@@ -79,8 +86,8 @@ print('Después de tirar: ')
 for i in range(len(player_pool_dice)):
     print(str(i+1) + ': ' +player_pool_dice[i])
 print('Resultados: ')
-for i in range(len(player_board)):
-    print(player_board[i],end=' ')
+for r,i in player_board.items():
+    print(str(i) + '	' + r + 's')
 
 # 4. Evaluar resultados
 
