@@ -27,9 +27,9 @@ import random
 
 # A. Definir juego
 # 1. Definir los dados
-RED_DICE_DEF = {'1':'Footstep','2':'Footstep','3':'Shotgun','4':'Shotgun','5':'Shotgun','6':'Brain'}
-YELLOW_DICE_DEF = {'1':'Footstep','2':'Footstep','3':'Shotgun','4':'Shotgun','5':'Brain','6':'Brain'}
-GREEN_DICE_DEF = {'1':'Footstep','2':'Footstep','3':'Shotgun','4':'Brain','5':'Brain','6':'Brain'}
+RED_DICE_DEF = {'1':'red_Footstep','2':'red_Footstep','3':'red_Shotgun','4':'red_Shotgun','5':'red_Shotgun','6':'red_Brain'}
+YELLOW_DICE_DEF = {'1':'yellow_Footstep','2':'yellow_Footstep','3':'yellow_Shotgun','4':'yellow_Shotgun','5':'yellow_Brain','6':'yellow_Brain'}
+GREEN_DICE_DEF = {'1':'green_Footstep','2':'green_Footstep','3':'green_Shotgun','4':'green_Brain','5':'green_Brain','6':'green_Brain'}
 
 AMOUNT_RED = 3
 AMOUNT_YELLOW = 4
@@ -45,51 +45,42 @@ player_pool_dice = []
 
 # Llenar el cubilete
 def fillPoolDice():
-    for i_red in range(AMOUNT_RED):
-        global_pool_dice.append('red_dice')
-    for i_yellow in range(AMOUNT_YELLOW):
-        global_pool_dice.append('yellow_dice')
-    for i_green in range(AMOUNT_GREEN):
-        global_pool_dice.append('green_dice')
-    random.shuffle(global_pool_dice)
-
+	for i_red in range(AMOUNT_RED):
+		global_pool_dice.append('red_dice')
+	for i_yellow in range(AMOUNT_YELLOW):
+		global_pool_dice.append('yellow_dice')
+	for i_green in range(AMOUNT_GREEN):
+		global_pool_dice.append('green_dice')
+	random.shuffle(global_pool_dice)
 # 2. Coger x dados
 def pickDices(amount_of_dices):
-    for dice in range(amount_of_dices):
-        random_pick = random.choice(global_pool_dice)
-        global_pool_dice.remove(random_pick)
-        player_pool_dice.append(random_pick)
+	for dice in range(amount_of_dices):
+		random_pick = random.choice(global_pool_dice)
+		global_pool_dice.remove(random_pick)
+		player_pool_dice.append(random_pick)
 
 # 3. Lanzar los dados
 def throw_dice():
-	  player_board_throw = dict(player_board_template)
-    while len(player_pool_dice)>0:
-        if player_pool_dice[0] == 'red_dice':
-            dice_result = RED_DICE_DEF[str(random.randint(1,6))]
-        if player_pool_dice[0] == 'yellow_dice':
-            dice_result = YELLOW_DICE_DEF[str(random.randint(1,6))]
-        if player_pool_dice[0] == 'green_dice':
-            dice_result = GREEN_DICE_DEF[str(random.randint(1,6))]
-        player_board_throw[dice_result] += 1
-        player_pool_dice.pop(0)
+	player_board_throw = dict(player_board_template)
+	while len(player_pool_dice)>0:
+		if player_pool_dice[0] == 'red_dice':
+			dice_result = RED_DICE_DEF[str(random.randint(1,6))]
+		if player_pool_dice[0] == 'yellow_dice':
+			dice_result = YELLOW_DICE_DEF[str(random.randint(1,6))]
+		if player_pool_dice[0] == 'green_dice':
+			dice_result = GREEN_DICE_DEF[str(random.randint(1,6))]
+		player_board_throw[dice_result] += 1
+		player_pool_dice.pop(0)
+	return player_board_throw
     #print('Resultado de la tirada:' + \n\n)
-    #for r,i print()
-
-# Test
-fillPoolDice()
-pickDices(3)
-print('Antes de tirar:')
-for i in range(len(player_pool_dice)):
-    print(str(i+1) + ': ' +player_pool_dice[i])
-throw_dice()
-print('Después de tirar: ')
-for i in range(len(player_pool_dice)):
-    print(str(i+1) + ': ' +player_pool_dice[i])
-print('Resultados: ')
-for r,i in player_board.items():
-    print(str(i) + '	' + r + 's')
+    #for r,i in player_board_throw.items():
+    #	print(str(i) + '	' + r + 's')
+    	
 
 # 4. Evaluar resultados
+# 4A Añadir resultado al pool
+def add_throw(player_board_throw):
+	
 
 # 5. Elección
 
@@ -100,3 +91,19 @@ for r,i in player_board.items():
 # 8. Condiciones victoria
 
 # 9. Empate
+
+
+
+# Test
+fillPoolDice()
+pickDices(3)
+print('Antes de tirar:')
+for i in range(len(player_pool_dice)):
+	print(str(i+1) + ': ' +player_pool_dice[i])
+throw_dice()
+print('Después de tirar: ')
+for i in range(len(player_pool_dice)):
+	print(str(i+1) + ': ' +player_pool_dice[i])
+print('Resultados: ')
+for r,i in player_board.items():
+	print(str(i) + '	' + r + 's')
