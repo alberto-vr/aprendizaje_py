@@ -167,59 +167,28 @@ def enough_dados():
     global player_defined_dice
     if len(global_pool_dice) < 3:
         for num, dado in enumerate(player_defined_dice):
-            if dado["resultado"] == "brain":
+            if dado["resultado"] == "Brain":
                 global_pool_dice.append(dado["color"])
                 player_defined_dice.pop(num)
                 numero_de_brains += 1
 
-
-
-# 7. No quedan suficientes dados
-
-# 8. Condiciones victoria
-
-# 9. Empate
-
-
-# Juego
-
-#Condiciones iniciales del juego
-player_blue_brains = 0
-player_red_brains = 0
-contador_turnos = 0
-ronda_completa = True
-dado_definido = dict(dado_definido_template)
-
-print("Comienza el juego de los dados Zombies")
-print("----------------------------------------")
-print("")
-
-current_player = random.choice(["Judador rojo","Jugador azul"])
-
-print(f"Comienza el juego el {current_player}\n")
-
-# Turnos intermedios normales
-while player_blue_brains < 13 and player_red_brains < 13:
+def turno(current_player,contador_turnos):
     # Condiciones iniciales de turno:
+    global player_blue_brains
+    global player_red_brains
     global_pool_dice = []
     player_unknown_dice = []
     player_defined_dice = []
-    fillPoolDice()
     shotgun_break = False
     decision_is_continue = True
+    fillPoolDice()
+    
 
     # Adaptación de variables a jugador
     if current_player == "Jugador rojo":
         numero_de_brains = player_red_brains
     else:
         numero_de_brains = player_blue_brains
-
-    # Contador de turnos
-    if ronda_completa == True:
-        contador_turnos += 1
-        ronda_completa = False
-    else:
-        ronda_completa = True
 
     print(f"Turno {contador_turnos} - {current_player}\n---------------------------------------\n")
 
@@ -254,6 +223,46 @@ while player_blue_brains < 13 and player_red_brains < 13:
         enough_dados()
 
 
+# 7. No quedan suficientes dados
+
+# 8. Condiciones victoria
+
+# 9. Empate
+
+
+# Juego
+
+#Condiciones iniciales del juego
+player_blue_brains = 0
+player_red_brains = 0
+contador_turnos = 0
+ronda_completa = True
+dado_definido = dict(dado_definido_template)
+global_pool_dice = []
+player_unknown_dice = []
+player_sefine_dice = []
+
+print("Comienza el juego de los dados Zombies")
+print("----------------------------------------")
+print("")
+
+current_player = random.choice(["Judador rojo","Jugador azul"])
+
+print(f"Comienza el juego el {current_player}\n")
+
+# Turnos intermedios normales
+while player_blue_brains < 13 and player_red_brains < 13:
+    
+    # Contador de turnos
+    if ronda_completa == True:
+        contador_turnos += 1
+        ronda_completa = False
+    else:
+        ronda_completa = True
+        
+    turno(current_player,contador_turnos)
+    
+    # Cambio de jugador
     print(f'Fin del turno de {current_player}\n')
     input('Press any key to continue')
     print('')
@@ -263,33 +272,3 @@ while player_blue_brains < 13 and player_red_brains < 13:
         current_player = 'Jugador rojo'
 
 
-
-
-
-
-
-
-
-
-
-
-
-# Test
-"""
-pickDices(3)
-print("")
-print('Antes de tirar:')
-
-for i in range(len(player_pool_dice)):
-    print(str(i+1) + ': ' +player_pool_dice[i])
-
-print("")
-print('Después de tirar: ')
-
-tirada = throw_dice()
-
-resultados_tirada = extraer_resultados(tirada)
-
-mostrar_resultados(resultados_tirada)
-
-"""
