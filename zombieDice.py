@@ -55,16 +55,16 @@ def pickDices(amount_of_dices): # Se coge un número int de dados
     """
     :param amount_of_dices: Número de dados (int)
     :return: global_pool_dice: Los dados en la reserva (list of str)
-    :return: player_pool_dice: Los dados en el cubilete (list of str)
+    :return: player_unknown_dice: Los dados en el cubilete (list of str)
     """
     global global_pool_dice
-    global player_pool_dice
+    global player_unknown_dice
     print(f"El {current_player} ha escogido: ")
     for dice in range(amount_of_dices):
         random_pick = random.choice(global_pool_dice)
         print(f"- {random_pick}")
         global_pool_dice.remove(random_pick)
-        player_pool_dice.append(random_pick)
+        player_unknown_dice.append(random_pick)
     print("")
 
 # 3. Lanzar los dados
@@ -72,21 +72,21 @@ def throw_dice(): # Se vacía el player_pool_dice
     """
     :return: Una tirada con dados definidos (list of dicts)
     """
-    global player_pool_dice
+    global player_unknown_dice
     global dado_definido
     player_throw = []
     print(f"El {current_player} lanza los dados y obtiene:")
-    while len(player_pool_dice)>0:
+    while len(player_unknown_dice)>0:
         dado_definido = dict(dado_definido_template)
-        if player_pool_dice[0] == 'red_dice':
+        if player_unknown_dice[0] == 'red_dice':
             dado_definido["resultado"] = RED_DICE_DEF[str(random.randint(1,6))]
-        elif player_pool_dice[0] == 'yellow_dice':
+        elif player_unknown_dice[0] == 'yellow_dice':
             dado_definido["resultado"] = YELLOW_DICE_DEF[str(random.randint(1, 6))]
-        elif player_pool_dice[0] == 'green_dice':
+        elif player_unknown_dice[0] == 'green_dice':
             dado_definido["resultado"] = GREEN_DICE_DEF[str(random.randint(1, 6))]
-        dado_definido["color"] = player_pool_dice[0]
+        dado_definido["color"] = player_unknown_dice[0]
         player_throw.append(dado_definido)
-        player_pool_dice.pop(0)
+        player_unknown_dice.pop(0)
 
     return player_throw    # [{"color": "x", "resultado": "y"}, {}, {}, ...]
 
@@ -129,23 +129,17 @@ def mostrar_resultados(dict_result):
 def add_tirada(tirada):
     """
     :global tirada: La tirada, una lista de dados definidos (list of dicts)
-    :global player_pool_dice:   El pool del jugador (list of dicts)
+    :global player_shown_dice:   El pool del jugador (list of dicts)
     :param global_pool_dice: El cubilete (list of str)
     :return:
     """
-    global player_pool_dice
     global global_pool_dice
+    global player_defined_dice
     while len(tirada) > 0:
         if tirada[0]["resultado"] == "Footstep":  # Primero desechamos los Footsteps y los devolvemos a la reserva
-            print("\nGlobal - Antes: " + str(global_pool_dice))
-            print(tirada[0]["color"])
             global_pool_dice.append(tirada[0]["color"])
-            print("Global - Despues: " + str(global_pool_dice) + "\n")
         else:
-            print("\nPlayer - Antes: " + str(player_pool_dice))
-            print(tirada[0])
-            player_pool_dice.append(tirada[0])
-            print("Player - Despues: " + str(player_pool_dice) + "\n")
+            player_defined_dice.append(tirada[0])
         tirada.pop(0)
 
 
@@ -169,11 +163,13 @@ def continue_or_stop():
 # 6. Devolver dados
 def enough_dados():
     global numero_de_brains
+    global global_pool_dice
+    global player_defined_dice
     if len(global_pool_dice) < 3:
-        for num, dado in enumerate(player_pool_dice):
+        for num, dado in enumerate(player_defined_dice):
             if dado["resultado"] == "brain":
                 global_pool_dice.append(dado["color"])
-                player_pool_dice.pop(num)
+                player_defined_dice.pop(num)
                 numero_de_brains += 1
 
 
@@ -203,10 +199,11 @@ current_player = random.choice(["Judador rojo","Jugador azul"])
 print(f"Comienza el juego el {current_player}\n")
 
 # Turnos intermedios normales
-while player_blue_brains < 13 or player_red_brains < 13:
+while player_blue_brains < 13 and player_red_brains < 13:
     # Condiciones iniciales de turno:
     global_pool_dice = []
-    player_pool_dice = []
+    player_unknown_dice = []
+    player_defined_dice = []
     fillPoolDice()
     shotgun_break = False
     decision_is_continue = True
@@ -226,7 +223,7 @@ while player_blue_brains < 13 or player_red_brains < 13:
 
     print(f"Turno {contador_turnos} - {current_player}\n---------------------------------------\n")
 
-    while shotgun_break == False or decision_is_continue == True:
+    while True:
         # El jugador coge 3 dados al azar de la reserva
         pickDices(3)
 
@@ -237,18 +234,33 @@ while player_blue_brains < 13 or player_red_brains < 13:
 
         # Comprueba si ha sacado 3 shotgun
         if shotgun_break == True:
-            continue
+            break
 
         # Añadir la tirada al pool
         add_tirada(tirada)
 
         print(f"\nEl {current_player} lleva acumulados los siguiente resultados:")
-        resultados_ronda = extraer_resultados(player_pool_dice)
+        resultados_ronda = extraer_resultados(player_defined_dice)
         mostrar_resultados(resultados_ronda)
+        print(f'Dados restantes: {len(global_pool_dice)}')
+        if shotgun_break == True:
+            break
 
         continue_or_stop()
+        
+        if decision_is_continue == False:
+            break
+            
+        enough_dados()
 
-    break
+
+    print(f'Fin del turno de {current_player}\n')
+    input('Press any key to continue')
+    print('')
+    if current_player == 'Jugador rojo':
+        current_player = 'Jugador azul'
+    else:
+        current_player = 'Jugador rojo'
 
 
 
