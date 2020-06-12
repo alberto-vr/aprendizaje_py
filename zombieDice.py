@@ -20,7 +20,7 @@ Si hay empate, juegan una ronda más.
 """
 
 import random
-from colorama import *
+from colorama import Fore as f
 
 # A. Definir juego
 # 1. Definir los dados
@@ -35,9 +35,7 @@ AMOUNT_GREEN = 6
 dado_definido_template = {'color': None, 'resultado': None}
 player_result_template = {'Footstep':0,'Shotgun':0,'Brain':0}
 
-
 def turno(current_player, contador_turnos, numero_de_brains):
-
 
     # 1. Llenar el cubilete
     def fillPoolDice():  # Condicion inicial, se llena el cubilete de dados
@@ -64,13 +62,18 @@ def turno(current_player, contador_turnos, numero_de_brains):
         """
         nonlocal global_pool_dice
         nonlocal player_unknown_dice
-        print(f"El {current_player} ha escogido: ")
+        print(f"El {current_player} ha robado: ", end="")
         for dice in range(amount_of_dices):
             random_pick = random.choice(global_pool_dice)
-            print(f"- {random_pick}")
+            if random_pick == "red_dice":
+                print(f"{f.RED} ■ {f.RESET}", end="")
+            elif random_pick == "yellow_dice":
+                print(f"{f.YELLOW} ■ {f.RESET}", end="")
+            elif random_pick == "green_dice":
+                print(f"{f.CYAN} ■ {f.RESET}", end="")
             global_pool_dice.remove(random_pick)
             player_unknown_dice.append(random_pick)
-        print("")
+        print(f"\nDespués de robar, hay un total de {len(global_pool_dice)} dados disponibles\n")
 
     # 3. Lanzar los dados
     def throw_dice():  # Se vacía el player_pool_dice
@@ -95,48 +98,39 @@ def turno(current_player, contador_turnos, numero_de_brains):
 
         return player_throw  # [{"color": "x", "resultado": "y"}, {}, {}, ...]
 
-    # 4. Extraer resultados de lista
-    def extraer_resultados(lista):  # Aquí se introduce una lista de dados definidos {color, resultado}
-        nonlocal shotgun_break
-        player_result = dict(player_result_template)
-        for dado in lista:
-            if dado["color"] == "red_dice":
-                print(f"{Fore.RED}{dado['resultado']}", end="")
-            elif dado["color"] == "green_dice":
-                print(f"{Fore.CYAN}{dado['resultado']}", end="")
-            elif dado["color"] == "yellow_dice":
-                print(f"{Fore.YELLOW}{dado['resultado']}", end="")
-            print(Fore.RESET)
-
-
-        for elemento in lista:
-            player_result[elemento["resultado"]] += 1
-
-        return player_result
-
-    # 5. Mostrar resultados en pantalla
-    def mostrar_resultados(dict_result):
+    # 4. Mostrar resultados en pantalla
+    def mostrar_resultados(lista):
         """
         :param dict_result: Una lista de dados definidos (list of dicts)
         :return: shotgun_break: Define si se han obtenido 3 o más shotguns esta tirada (boolean)
         """
         nonlocal shotgun_break
-        if dict_result['Footstep'] > 0:
-            print(f"{Fore.BLUE}{dict_result['Footstep']}   Footsteps")
-        if dict_result['Shotgun'] > 0:
-            print(f"{Fore.BLUE}{dict_result['Shotgun']}   Shotguns")
-        if dict_result['Brain'] > 0:
-            print(f"{Fore.BLUE}{dict_result['Brain']}   Brains")
-        print(Fore.RESET)
+        player_result = dict(player_result_template)
+
+        def daditos(lista, resultado):
+            nonlocal player_result
+            print(f"{resultado}s:" + (12-len(resultado))*" ", end="")
+            for elemento in lista:
+                if elemento["resultado"] == resultado and elemento["color"] == "red_dice":
+                    print(f"{f.RED} ■ {f.RESET}", end="")
+                elif elemento["resultado"] == resultado and elemento["color"] == "yellow_dice":
+                    print(f"{f.YELLOW} ■ {f.RESET}", end="")
+                elif elemento["resultado"] == resultado and elemento["color"] == "green_dice":
+                    print(f"{f.CYAN} ■ {f.RESET}", end="")
+                player_result[elemento["resultado"]] += 1
+            return player_result[elemento["resultado"]]
+        for resultado in ["Footstep", "Shotgun", "Brain"]:
+            daditos(lista, resultado)
+            print("")
 
         # Comprobar si se han obtenido 3 shotguns esta tirada
         shotgun_break = False
-        if dict_result["Shotgun"] >= 3:
+        if player_result["Shotgun"] >= 3:
             print("")
             print("Se han obtenido 3 shotguns esta tirada. Se pasa turno")
             shotgun_break = True
 
-    # 6 Añadir resultado al pool
+    # 5 Añadir resultado al pool
     def add_tirada(tirada):
         """
         :global tirada: La tirada, una lista de dados definidos (list of dicts)
@@ -154,7 +148,7 @@ def turno(current_player, contador_turnos, numero_de_brains):
                 player_defined_dice.append(tirada[0])
             tirada.pop(0)
 
-    # 7. Elección
+    # 6. Elección
     def continue_or_stop():
         """
         :return: decision_is_continue: Continuamos (boolean)
@@ -170,7 +164,7 @@ def turno(current_player, contador_turnos, numero_de_brains):
         elif decision == "s":
             decision_is_continue = False
 
-    # 6. Devolver dados
+    # 7. Devolver dados
     def enough_dados():
         nonlocal numero_de_brains
         nonlocal global_pool_dice
@@ -183,23 +177,24 @@ def turno(current_player, contador_turnos, numero_de_brains):
                     numero_de_brains += 1
 
     # Condiciones iniciales de turno:
-    global_pool_dice = fillPoolDice()
     player_unknown_dice = []
     player_defined_dice = []
     shotgun_break = False
     decision_is_continue = True
 
 
-    print(f"Turno {contador_turnos} - {current_player}\n---------------------------------------\n")
-
+    print(f"\nTurno {contador_turnos} - {current_player}\n---------------------------------------\n")
+    global_pool_dice = fillPoolDice()
     while True:
+
+        input(f"\nEl {current_player} va a proceder a robar 3 dados:\n")
         # El jugador coge 3 dados al azar de la reserva
         pickDices(3)
 
         # Lanza los dados
+        input(f"\nEl {current_player} va a proceder a lanzar los dados:\n")
         tirada = throw_dice()
-        resultados_tirada = extraer_resultados(tirada)
-        mostrar_resultados(resultados_tirada)
+        mostrar_resultados(tirada)
 
         # Comprueba si ha sacado 3 shotgun
         if shotgun_break == True:
@@ -209,8 +204,7 @@ def turno(current_player, contador_turnos, numero_de_brains):
         add_tirada(tirada)
 
         print(f"\nEl {current_player} lleva acumulados los siguiente resultados:")
-        resultados_ronda = extraer_resultados(player_defined_dice)
-        mostrar_resultados(resultados_ronda)
+        mostrar_resultados(tirada)
         print(f'Dados restantes: {len(global_pool_dice)}')
         if shotgun_break == True:
             break
@@ -238,13 +232,13 @@ player_red_brains = 0
 contador_turnos = 0
 ronda_completa = True
 
-print("Comienza el juego de los dados Zombies")
+print("\nComienza el juego de los dados Zombies")
 print("----------------------------------------")
 print("")
-
+input("Se va a elegir al azar al jugador que comienza el juego...")
 current_player = random.choice(["Judador rojo","Jugador azul"])
 
-print(f"Comienza el juego el {current_player}\n")
+print(f"\nComienza el juego el {current_player}\n")
 
 # Turnos intermedios normales
 while player_blue_brains < 13 and player_red_brains < 13:
@@ -257,6 +251,7 @@ while player_blue_brains < 13 and player_red_brains < 13:
         ronda_completa = True
 
     # Se definen los valores en función del jugador
+    input(f"Pulsa para comenzar el turno {contador_turnos}")
     if current_player == "Jugador rojo":
         player_red_brains = turno(current_player, contador_turnos, player_red_brains)
     else:
